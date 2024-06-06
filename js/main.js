@@ -46,6 +46,7 @@ async function addNewUserEntry(currentActive){
         newUserEntry.append(newUserMessage, userIcon)
         chatRoom.append(newUserEntry)
         messageArea.value = ''
+        localStorage.setItem(currentActive, chatRoom.innerHTML)
     }
 }
 
@@ -112,12 +113,14 @@ const userPicture = document.querySelector('.userPicture')
 const currentActiveConversations = document.querySelectorAll('.newConvo')
 currentActiveConversations.forEach((elem, idx) => {
     elem.addEventListener('click', () => {
-        localStorage.setItem(currentActive, chatRoom.innerHTML)
         elem.classList.add('active')
         userPicture.style.backgroundImage = `url('../public/img/client${idx+1}.png')`
         currentActiveConversations[currentActive].classList.remove('active')
         currentActive = idx
         chatRoom.innerHTML = localStorage.getItem(currentActive)
-
     })
+})
+console.log(localStorage)
+window.addEventListener('load', () => {
+    chatRoom.innerHTML = localStorage.getItem(currentActive)
 })
