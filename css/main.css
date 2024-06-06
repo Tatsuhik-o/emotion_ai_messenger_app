@@ -108,9 +108,13 @@ body{
     border: none;
     width: 90%;
     overflow: hidden;
+    display: flex;
+    align-items: center;
     transition: transform 0.2s ease-in-out;
+    user-select: none;
     &:hover{
         background-color: #476CFF;
+        color: white;
     }
     &:active{
         transform: scale(0.95);
@@ -118,6 +122,55 @@ body{
 }
 .active{
     background-color: #476CFF;
+}
+.convoPic{
+    width: 20%;
+    height: 95%;
+    border-radius: 50px;
+}
+.clientOne{
+    background-image: url('../public/img/client1.png');
+    background-size: cover;
+    background-position: center center;
+}
+.clientTwo{
+    background-image: url('../public/img/client2.png');
+    background-size: cover;
+    background-position: center center;
+}
+.clientThree{
+    background-image: url('../public/img/client3.png');
+    background-size: cover;
+    background-position: center center;
+}
+.clientFour{
+    background-image: url('../public/img/client4.png');
+    background-size: cover;
+    background-position: center center;
+}
+.clientFive{
+    background-image: url('../public/img/client5.png');
+    background-size: cover;
+    background-position: center center;
+}
+.convoInfo{
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+.active .convoInfo{
+    color: white;
+}
+.convoName{
+    font-size: 1.5rem;
+    margin-top: 10px;
+}
+.lastMessage{
+    font-size: 1.1rem;
+    opacity: 0.65;
+    margin-bottom: 10px;
 }
 .rightSideContainer{
     width: 65%;
@@ -144,7 +197,7 @@ body{
 }
 .userPicture{
     width: 30%;
-    background-image: url('../public/img/user_default_icon.png');
+    background-image: url('../public/img/client1.png');
     background-size: cover;
     background-position: center center;
     transition: transform 2s ease-in-out;
@@ -265,7 +318,6 @@ body{
     height: 75px;
     margin-right: auto;
     border-radius: 50%;
-    background-image: url('../public/img/user_default_icon.png');
     background-size: cover;
     background-position: center center;
 }
@@ -330,7 +382,7 @@ body{
     .userPicture{
         width: 50%;
         height: 100%;
-        background-image: url('../public/img/user_default_icon.png');
+        background-image: url('../public/img/client1.png');
         background-size: cover;
         background-position: center center;
         transition: transform 2s ease-in-out;
@@ -456,7 +508,7 @@ body{
         height: 100px;
         margin-right: auto;
         border-radius: 50%;
-        background-image: url('../public/img/user_default_icon.png');
+        background-image: url('../public/img/client1.png');
         background-size: cover;
         background-position: center center;
     }
@@ -523,7 +575,7 @@ body{
     .userPicture{
         width: 50%;
         height: 100%;
-        background-image: url('../public/img/user_default_icon.png');
+        background-image: url('../public/img/client1.png');
         background-size: cover;
         background-position: center center;
         transition: transform 2s ease-in-out;
@@ -649,7 +701,7 @@ body{
         height: 50px;
         margin-right: auto;
         border-radius: 50%;
-        background-image: url('../public/img/user_default_icon.png');
+        background-image: url('../public/img/client1.png');
         background-size: cover;
         background-position: center center;
     }
@@ -715,8 +767,8 @@ body{
         align-items: center;
     }
     .userPicture{
-        width: 60%;
-        background-image: url('../public/img/user_default_icon.png');
+        width: 80%;
+        background-image: url('../public/img/client1.png');
         background-size: cover;
         background-position: center center;
         transition: transform 2s ease-in-out;
@@ -842,7 +894,7 @@ body{
         height: 50px;
         margin-right: auto;
         border-radius: 50%;
-        background-image: url('../public/img/user_default_icon.png');
+        background-image: url('../public/img/client1.png');
         background-size: cover;
         background-position: center center;
     }

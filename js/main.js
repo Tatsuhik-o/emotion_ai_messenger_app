@@ -1,6 +1,6 @@
 const clientImage = document.querySelector('.userPicture')
 clientImage.style.height = window.getComputedStyle(clientImage).width
-
+let currentActive = 0
 let clientImageActive = true
 clientImage.addEventListener('click', () => {
     if(clientImageActive){
@@ -21,13 +21,13 @@ let newMessage = ''
 const messageArea = document.querySelector('.typeMessage input')
 messageArea.addEventListener('keydown', (e) => {
     if(e.key === 'Enter'){
-        addNewUserEntry()
+        addNewUserEntry(currentActive)
     }
 })
 
-// Adding a new use message to DOM
+// Adding a new user message to DOM
 
-async function addNewUserEntry(){
+async function addNewUserEntry(currentActive){
     newMessage = messageArea.value
     if(newMessage !== ''){
         const newUserEntry = document.createElement('div')
@@ -41,6 +41,7 @@ async function addNewUserEntry(){
 
         const userIcon = document.createElement('div')
         userIcon.classList.add('userIcon')
+        userIcon.style.backgroundImage = `url('../public/img/client${currentActive+1}.png')`
 
         newUserEntry.append(newUserMessage, userIcon)
         chatRoom.append(newUserEntry)
@@ -66,7 +67,7 @@ async function addNewAIEntry(AIResponse){
     chatRoom.append(newAIEntry)
 }
 const sendButton = document.querySelector('.sendMessage')
-sendButton.addEventListener('click', addNewUserEntry)
+sendButton.addEventListener('click', addNewUserEntry(currentActive))
 
 // Using Memory Translate API to translte from english -> japanese
 
@@ -107,5 +108,16 @@ async function translateToEnglish(text) {
         return null;
     }
 }
+const userPicture = document.querySelector('.userPicture')
+const currentActiveConversations = document.querySelectorAll('.newConvo')
+currentActiveConversations.forEach((elem, idx) => {
+    elem.addEventListener('click', () => {
+        localStorage.setItem(currentActive, chatRoom.innerHTML)
+        elem.classList.add('active')
+        userPicture.style.backgroundImage = `url('../public/img/client${idx+1}.png')`
+        currentActiveConversations[currentActive].classList.remove('active')
+        currentActive = idx
+        chatRoom.innerHTML = localStorage.getItem(currentActive)
 
-//Hello, My Name Is Taha. I am very pleased to meet you, hope we can share together and learn together
+    })
+})
