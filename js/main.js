@@ -49,9 +49,8 @@ async function addNewUserEntry(currentActive){
         messageArea.disabled = true
         const AI_Entry_Text = await AI_response(newMessage)
         const AI_To_Japanese = await translateToJapanese(AI_Entry_Text)
-        addNewAIEntry(AI_To_Japanese)
+        addNewAIEntry(AI_To_Japanese, currentActive)
         messageArea.disabled = false
-        localStorage.setItem(currentActive, chatRoom.innerHTML)
     }
 }
 
@@ -71,6 +70,8 @@ async function addNewAIEntry(AIResponse){
 
     newAIEntry.append(newAIIcon, newAIMessage)
     chatRoom.append(newAIEntry)
+    localStorage.setItem(currentActive, chatRoom.innerHTML)
+    lastMessages[currentActive] = localStorage.getItem(currentActive).split('<div class="userEntry"><div class="userMessage">').pop().split('</div>')[0].substr(0, 10) + ' ...'
 }
 const sendButton = document.querySelector('.sendMessage')
 sendButton.addEventListener('click', addNewUserEntry(currentActive))
@@ -128,14 +129,13 @@ currentActiveConversations.forEach((elem, idx) => {
         chatRoom.innerHTML = localStorage.getItem(idx)
         localStorage.setItem('currentActive', idx)
         currentActive = idx
-        console.log(localStorage)
     })
 })
 
 // Loading Last Opened Conversation
-
+const lastMessages = document.querySelectorAll('.lastMessage')
 window.addEventListener('load', () => {
-    if(localStorage.getItem(currentActive)){
+    if(localStorage.getItem('currentActive')){
         currentActive = parseInt(localStorage.getItem('currentActive'))
     }
     else{
@@ -145,6 +145,14 @@ window.addEventListener('load', () => {
     currentActiveConversations[currentActive].classList.add('active')
     resetClassList()
     userPicture.classList.add(returnImage(currentActive))
+    lastMessages.forEach((elem, idx) => {
+        if(localStorage.getItem(idx)){
+            lastMessages[idx].innerText = localStorage.getItem(idx).split('<div class="userEntry"><div class="userMessage">').pop().split('</div>')[0].substr(0, 10) + ' ...'
+        }
+        else{
+            lastMessages.innerText = ''
+        }
+    })
 })
 
 // Returning User Image (Had to use classes since github doesn't accept in-style images)
@@ -172,14 +180,14 @@ function resetActives(){
 // Generating AI Response
 
 async function AI_response(message){
-    const API_KEY = ''; // You API_Key Here from OPENAI
+    const API_KEY = 'sk-proj-kRzbr1jsxUKomY2HsorZT3BlbkFJh1QOyRtDSFUfanORHPHu'; // You API_Key Here from OPENAI
     const sentData = {
     model: 'gpt-3.5-turbo',
     messages: [
         { role: 'system', content: `keep in mind that user is ${getEmotion(message)}, so say something appropriate to his or her feelings` },
         { role: 'user', content: `${message}` }
     ],
-    max_tokens: 200
+    max_tokens: 500
     };
     const options = {
                     method: 'POST',
@@ -197,7 +205,7 @@ async function AI_response(message){
 // Determining Emotion Based on Text provided by Client
 
 async function getEmotion(text_Message){
-    const API_Key = '' // Emotion API_Key HERE
+    const API_Key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWU4OTMwYWMtNzRjNy00ZWE2LTljM2ItOWUzMmMzZmQ5YWUyIiwidHlwZSI6ImFwaV90b2tlbiJ9.uXTwX8xisg1d8uAGS8pY6vCYdNcO_bUVwCDnI89MK38' // Emotion API_Key HERE
     const url = 'https://api.edenai.run/v2/text/emotion_detection'
     const dataToSend ={
                     providers: "nlpcloud,vernai",
