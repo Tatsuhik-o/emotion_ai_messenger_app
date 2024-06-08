@@ -21,11 +21,6 @@ let newMessage = ''
 const messageArea = document.querySelector('.typeMessage input')
 messageArea.addEventListener('keydown', (e) => {
     if(e.key === 'Enter'){
-        /*messageArea.disabled = true
-        setTimeout(() => {
-            messageArea.disabled = false
-        }, 2000)
-        */
         addNewUserEntry(currentActive)
     }
 })
@@ -55,9 +50,7 @@ async function addNewUserEntry(currentActive){
         const AI_Entry_Text = await AI_response(newMessage)
         const AI_To_Japanese = await translateToJapanese(AI_Entry_Text)
         addNewAIEntry(AI_To_Japanese)
-
         messageArea.disabled = false
-        
         localStorage.setItem(currentActive, chatRoom.innerHTML)
     }
 }
@@ -179,7 +172,7 @@ function resetActives(){
 // Generating AI Response
 
 async function AI_response(message){
-    const API_KEY = 'sk-proj-UvYXdM8nuZJCDY82Xw47T3BlbkFJ0t2BkKej5uU4QHt5pxIq';
+    const API_KEY = ''; // You API_Key Here from OPENAI
     const sentData = {
     model: 'gpt-3.5-turbo',
     messages: [
