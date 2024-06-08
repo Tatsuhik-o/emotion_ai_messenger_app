@@ -197,7 +197,7 @@ async function AI_response(message){
 // Determining Emotion Based on Text provided by Client
 
 async function getEmotion(text_Message){
-    const API_Key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWU4OTMwYWMtNzRjNy00ZWE2LTljM2ItOWUzMmMzZmQ5YWUyIiwidHlwZSI6ImFwaV90b2tlbiJ9.uXTwX8xisg1d8uAGS8pY6vCYdNcO_bUVwCDnI89MK38'
+    const API_Key = '' // Emotion API_Key HERE
     const url = 'https://api.edenai.run/v2/text/emotion_detection'
     const dataToSend ={
                     providers: "nlpcloud,vernai",
