@@ -21,6 +21,11 @@ let newMessage = ''
 const messageArea = document.querySelector('.typeMessage input')
 messageArea.addEventListener('keydown', (e) => {
     if(e.key === 'Enter'){
+        /*messageArea.disabled = true
+        setTimeout(() => {
+            messageArea.disabled = false
+        }, 2000)
+        */
         addNewUserEntry(currentActive)
     }
 })
@@ -41,12 +46,18 @@ async function addNewUserEntry(currentActive){
 
         const userIcon = document.createElement('div')
         userIcon.classList.add('userIcon')
-        userIcon.style.backgroundImage = `url('../public/img/client${currentActive+1}.png')`
+        userIcon.classList.add(returnImage(currentActive))
 
         newUserEntry.append(newUserMessage, userIcon)
         chatRoom.append(newUserEntry)
-        //AI
         messageArea.value = ''
+        messageArea.disabled = true
+        const AI_Entry_Text = await AI_response(newMessage)
+        const AI_To_Japanese = await translateToJapanese(AI_Entry_Text)
+        addNewAIEntry(AI_To_Japanese)
+
+        messageArea.disabled = false
+        
         localStorage.setItem(currentActive, chatRoom.innerHTML)
     }
 }
@@ -110,18 +121,26 @@ async function translateToEnglish(text) {
         return null;
     }
 }
+
+// Adding event Listeners to All Conversations
+
 const userPicture = document.querySelector('.userPicture')
 const currentActiveConversations = document.querySelectorAll('.newConvo')
 currentActiveConversations.forEach((elem, idx) => {
     elem.addEventListener('click', () => {
-        elem.classList.add('active')
+        resetActives()
         resetClassList()
+        elem.classList.add('active')
         userPicture.classList.add(returnImage(idx))
-        currentActiveConversations[currentActive].classList.remove('active')
+        chatRoom.innerHTML = localStorage.getItem(idx)
+        localStorage.setItem('currentActive', idx)
         currentActive = idx
-        chatRoom.innerHTML = localStorage.getItem(currentActive)
+        console.log(localStorage)
     })
 })
+
+// Loading Last Opened Conversation
+
 window.addEventListener('load', () => {
     if(localStorage.getItem(currentActive)){
         currentActive = parseInt(localStorage.getItem('currentActive'))
@@ -134,6 +153,9 @@ window.addEventListener('load', () => {
     resetClassList()
     userPicture.classList.add(returnImage(currentActive))
 })
+
+// Returning User Image (Had to use classes since github doesn't accept in-style images)
+
 function returnImage(num){
     if(num === 0) return 'userOne' 
     if(num === 1) return 'userTwo' 
@@ -148,15 +170,20 @@ function resetClassList(){
     userPicture.classList.remove('userFour')
     userPicture.classList.remove('userFive')
 }
-window.addEventListener('beforeunload', () => {
-    localStorage.setItem('currentActive', currentActive)
-})
-async function AI_response(message, emotion){
-    const API_KEY = '';
+function resetActives(){
+    currentActiveConversations.forEach(elem => {
+        elem.classList.remove('active')
+    })
+}
+
+// Generating AI Response
+
+async function AI_response(message){
+    const API_KEY = 'sk-proj-UvYXdM8nuZJCDY82Xw47T3BlbkFJ0t2BkKej5uU4QHt5pxIq';
     const sentData = {
     model: 'gpt-3.5-turbo',
     messages: [
-        { role: 'system', content: `keep in mind that user is ${emotion}, so say something appropriate to his or her emotions` },
+        { role: 'system', content: `keep in mind that user is ${getEmotion(message)}, so say something appropriate to his or her feelings` },
         { role: 'user', content: `${message}` }
     ],
     max_tokens: 200
@@ -171,11 +198,39 @@ async function AI_response(message, emotion){
                     }
     const response = await fetch('https://api.openai.com/v1/chat/completions', options)
     const AI_Message = await response.json()
-    console.log(AI_Message)
+    return AI_Message.choices[0].message.content
 }
-/*
-function getEmotion(text_Message){
 
+// Determining Emotion Based on Text provided by Client
+
+async function getEmotion(text_Message){
+    const API_Key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWU4OTMwYWMtNzRjNy00ZWE2LTljM2ItOWUzMmMzZmQ5YWUyIiwidHlwZSI6ImFwaV90b2tlbiJ9.uXTwX8xisg1d8uAGS8pY6vCYdNcO_bUVwCDnI89MK38'
+    const url = 'https://api.edenai.run/v2/text/emotion_detection'
+    const dataToSend ={
+                    providers: "nlpcloud,vernai",
+                    text: `text_Message`,
+                }
+    const options = {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_Key}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dataToSend)
+                    }
+    const response = await fetch(url, options)
+    const emotion = await response.json()
+    currentEmotion = emotion.nlpcloud.items[0]['emotion']
+    return translatedEmotion(currentEmotion)
 }
-*/
-//AI_response('My name is Taha, very pleased to meet you', 'Happy')
+
+// Translating Emotion Spectrum into a Single Word
+
+function translatedEmotion(emotion){
+    if(emotion === 'Anger') return 'Angry'
+    if(emotion === 'Joy') return 'Happy'
+    if(emotion === 'Fear') return 'Scared'
+    if(emotion === 'Sadness') return 'Sad'
+    if(emotion === 'Love') return 'In Love'
+    if(emotion === 'Surprise') return 'Surprised'
+}
