@@ -26,7 +26,7 @@ body{
 .leftSideContainer{
     width: 35%;
     height: 100%;
-    background-color: #F8F8F8;
+    background-color: rgb(236, 236, 236);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -127,28 +127,30 @@ body{
     width: 20%;
     height: 95%;
     border-radius: 50px;
+    background-size: cover;
+    background-position: center center;
 }
-.clientOne{
+.client1{
     background-image: url('../public/img/client1.png');
     background-size: cover;
     background-position: center center;
 }
-.clientTwo{
+.client2{
     background-image: url('../public/img/client2.png');
     background-size: cover;
     background-position: center center;
 }
-.clientThree{
+.client3{
     background-image: url('../public/img/client3.png');
     background-size: cover;
     background-position: center center;
 }
-.clientFour{
+.client4{
     background-image: url('../public/img/client4.png');
     background-size: cover;
     background-position: center center;
 }
-.clientFive{
+.client5{
     background-image: url('../public/img/client5.png');
     background-size: cover;
     background-position: center center;

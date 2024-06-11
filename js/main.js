@@ -1,12 +1,15 @@
 const clientImage = document.querySelector('.userPicture')
 clientImage.style.height = window.getComputedStyle(clientImage).width
+const newUserConvo = document.querySelector('.startConvoIcon')
+const convoArea = document.querySelector('.convoArea')
+
 let currentActive = 0
 let clientImageActive = true
 let conversationHistory
 
 async function detectLanguage(text){
     const API_URL = 'https://ws.detectlanguage.com/0.2/detect'
-    const API_Key = '91f3e9f74ae9e952176ca61c033b4a20'
+    const API_Key = ''
     const options = {
         method: 'POST',
         headers: {
@@ -96,7 +99,9 @@ async function addNewAIEntry(AIResponse){
     lastMessages[currentActive] = localStorage.getItem(currentActive).split('<div class="userEntry"><div class="userMessage">').pop().split('</div>')[0].substr(0, 10) + ' ...'
 }
 const sendButton = document.querySelector('.sendMessage')
-sendButton.addEventListener('click', addNewUserEntry(currentActive))
+sendButton.addEventListener('click', () => {
+    addNewUserEntry(currentActive)
+})
 
 // Using Memory Translate API to translte from english -> japanese
 
@@ -239,7 +244,7 @@ async function AI_response(message){
 // Determining Emotion Based on Text provided by Client
 
 async function getEmotion(text_Message){
-    const API_Key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWU4OTMwYWMtNzRjNy00ZWE2LTljM2ItOWUzMmMzZmQ5YWUyIiwidHlwZSI6ImFwaV90b2tlbiJ9.uXTwX8xisg1d8uAGS8pY6vCYdNcO_bUVwCDnI89MK38' // Emotion API_Key HERE
+    const API_Key = '' // Emotion API_Key HERE
     const url = 'https://api.edenai.run/v2/text/emotion_detection'
     const dataToSend ={
                     providers: "nlpcloud,vernai",
