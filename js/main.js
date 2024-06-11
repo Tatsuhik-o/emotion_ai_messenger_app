@@ -214,7 +214,7 @@ function resetActives(){
 // Generating AI Response
 
 async function AI_response(message){
-    const API_KEY = 'sk-proj-kRzbr1jsxUKomY2HsorZT3BlbkFJh1QOyRtDSFUfanORHPHu'; // You API_Key Here from OPENAI
+    const API_KEY = ''; // You API_Key Here from OPENAI
     const sentData = {
     model: 'gpt-3.5-turbo',
     messages: [
