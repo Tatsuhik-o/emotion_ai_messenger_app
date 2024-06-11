@@ -2,6 +2,26 @@ const clientImage = document.querySelector('.userPicture')
 clientImage.style.height = window.getComputedStyle(clientImage).width
 let currentActive = 0
 let clientImageActive = true
+let conversationHistory
+
+async function detectLanguage(text){
+    const API_URL = 'https://ws.detectlanguage.com/0.2/detect'
+    const API_Key = '91f3e9f74ae9e952176ca61c033b4a20'
+    const options = {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${API_Key}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ q: text })
+        }
+    const response = await fetch(API_URL, options)
+    if(response.ok){
+        const receivedData = await response.json()
+        return receivedData.data.detections[0]['language']
+    }
+}
+
 clientImage.addEventListener('click', () => {
     if(clientImageActive){
         clientImageActive = false
@@ -14,7 +34,6 @@ clientImage.addEventListener('click', () => {
         clientImageActive = true
     }, 4000)
 })
-
 
 const chatRoom = document.querySelector('.chatRoom')
 let newMessage = ''
@@ -30,29 +49,33 @@ messageArea.addEventListener('keydown', (e) => {
 async function addNewUserEntry(currentActive){
     newMessage = messageArea.value
     if(newMessage !== ''){
+        const lang = await detectLanguage(newMessage)
         const newUserEntry = document.createElement('div')
         newUserEntry.classList.add('userEntry')
-
         const newUserMessage = document.createElement('div')
         newUserMessage.classList.add('userMessage')
-
-        const translatedMessage = await translateToJapanese(newMessage)
-        newUserMessage.innerText = translatedMessage
-
+        newUserMessage.innerText = newMessage
         const userIcon = document.createElement('div')
         userIcon.classList.add('userIcon')
         userIcon.classList.add(returnImage(currentActive))
-
         newUserEntry.append(newUserMessage, userIcon)
         chatRoom.append(newUserEntry)
         messageArea.value = ''
         messageArea.disabled = true
-        const AI_Entry_Text = await AI_response(newMessage)
-        const AI_To_Japanese = await translateToJapanese(AI_Entry_Text)
+        const English_Response = lang !== 'en' ? await translateToEnglish(newMessage, lang) : newMessage
+        conversationHistory[currentActive].push(English_Response)
+        const WholeConversation = conversationHistory[currentActive].join('\n')
+        const AI_Entry_Text = await AI_response(WholeConversation)
+        const AI_To_Japanese = lang !== 'en' ? await translateBack(AI_Entry_Text, lang) : AI_Entry_Text
+        conversationHistory[currentActive].push(AI_Entry_Text)
         addNewAIEntry(AI_To_Japanese, currentActive)
         messageArea.disabled = false
+        localStorage.setItem('conversationHistory', JSON.stringify(conversationHistory))
+        lastMessages[currentActive].innerText = newMessage.substr(0, 15) + ' ...'
     }
 }
+
+
 
 // Adding a new entry that AI returns to DOM
 
@@ -65,8 +88,7 @@ async function addNewAIEntry(AIResponse){
 
     const newAIMessage = document.createElement('div')
     newAIMessage.classList.add('AIMessage')
-    const translatedMessage = await translateToJapanese(AIResponse)
-    newAIMessage.innerText = translatedMessage
+    newAIMessage.innerText = AIResponse
 
     newAIEntry.append(newAIIcon, newAIMessage)
     chatRoom.append(newAIEntry)
@@ -78,8 +100,8 @@ sendButton.addEventListener('click', addNewUserEntry(currentActive))
 
 // Using Memory Translate API to translte from english -> japanese
 
-async function translateToJapanese(text) {
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ja`;
+async function translateBack(text, lang) {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${lang}`;
     
     try {
         const response = await fetch(url);
@@ -98,8 +120,9 @@ async function translateToJapanese(text) {
 
 // Using Memory Translate API to translte from japanese -> english
 
-async function translateToEnglish(text) {
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ja|en&key='eecdeb1c177ba5531d04'&de='mohamedtahahalim@gmail.com'`;
+async function translateToEnglish(text, lang) {
+    //&key='eecdeb1c177ba5531d04'&de='mohamedtahahalim@gmail.com'
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${lang}|en`;
     
     try {
         const response = await fetch(url);
@@ -131,7 +154,6 @@ currentActiveConversations.forEach((elem, idx) => {
         currentActive = idx
     })
 })
-
 // Loading Last Opened Conversation
 const lastMessages = document.querySelectorAll('.lastMessage')
 window.addEventListener('load', () => {
@@ -141,13 +163,25 @@ window.addEventListener('load', () => {
     else{
         currentActive = 0
     }
+    if(localStorage.getItem('conversationHistory')){
+        conversationHistory = JSON.parse(localStorage.getItem('conversationHistory'))
+    }
+    else{
+        conversationHistory = {
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: []
+        }
+    }
     chatRoom.innerHTML = localStorage.getItem(currentActive)
     currentActiveConversations[currentActive].classList.add('active')
     resetClassList()
     userPicture.classList.add(returnImage(currentActive))
     lastMessages.forEach((elem, idx) => {
         if(localStorage.getItem(idx)){
-            lastMessages[idx].innerText = localStorage.getItem(idx).split('<div class="userEntry"><div class="userMessage">').pop().split('</div>')[0].substr(0, 10) + ' ...'
+            lastMessages[idx].innerText = (localStorage.getItem(idx).split('<div class="userEntry"><div class="userMessage">').pop().split('</div>')[0].substr(0, 15) + ' ...')
         }
         else{
             lastMessages.innerText = ''
@@ -184,7 +218,7 @@ async function AI_response(message){
     const sentData = {
     model: 'gpt-3.5-turbo',
     messages: [
-        { role: 'system', content: `keep in mind that user is ${getEmotion(message)}, so say something appropriate to his or her feelings` },
+        { role: 'system', content: `keep in mind that user is saf, so say something appropriate to his or her feelings` },
         { role: 'user', content: `${message}` }
     ],
     max_tokens: 500
@@ -221,6 +255,7 @@ async function getEmotion(text_Message){
                     }
     const response = await fetch(url, options)
     const emotion = await response.json()
+    console.log(emotion)
     currentEmotion = emotion.nlpcloud.items[0]['emotion']
     return translatedEmotion(currentEmotion)
 }
